@@ -2,8 +2,8 @@
 
 const express = require('express');
 require('dotenv').config();
-let data = require('./data/weather.json');
 const cors = require('cors');
+const axios = require('axios');
 
 
 const app = express();
@@ -15,40 +15,37 @@ const PORT = process.env.PORT || 3003;
 
 
 app.get('/', (request, response) => {
-  // console.log('This is showing up in the terminal!');
   response.status(200).send('Welcome to my server');
 });
 
-app.get('/hello', (request, response) => {
-  // console.log(request.query);
-  let cityName = request.query.cityName;
-  response.status(200).send(`Hello from ${citytName}`);
-});
-
-app.get('/cityName', (request, response, next) => {
+app.get('/weather', async (request, response) => {
+  let cityName = request.query.city;
+  let url = `http://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHER_API_KEY}&city=${cityName}&days=7`;
   try {
-    let cityName = request.query.cityName;
+    let weatherResponse = await axios.get(url);
+    console.log(weatherResponse.data);
+    let dataToSend = weatherResponse.data.data.map(element => {
+      return new Weather(element);
+    });
 
-    let searchQuery = data.find(weather => weather.cityName === cityName);
-
-    let dataToSend = new weather(searchQuery);
-    response.status(200).send(dataToSend);
+    response.send(dataToSend).status(200);
   } catch (error) {
-    next(error);
+    response.send(error.message).status(500);
   }
+
 });
 
-class weather {
+
+class Weather {
   constructor(weatherObj) {
-    this.city = weatherObj.city;
+    this.date = weatherObj.valid_date;
+    this.description = weatherObj.weather.description;
   }
 }
 
 app.get('*', (request, response) => {
   response.status(404).send('This route does not exist');
 });
-
-
 
 
 
