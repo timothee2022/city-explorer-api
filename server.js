@@ -23,7 +23,7 @@ app.get('/weather', async (request, response) => {
   let url = `http://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHER_API_KEY}&city=${cityName}&days=7`;
   try {
     let weatherResponse = await axios.get(url);
-    console.log(weatherResponse.data);
+    // console.log(weatherResponse.data);
     let dataToSend = weatherResponse.data.data.map(element => {
       return new Weather(element);
     });
@@ -43,21 +43,20 @@ class Weather {
   }
 }
 
-app.get('*', (request, response) => {
-  response.status(404).send('This route does not exist');
-});
 
 
 
 
 app.get('/movies', async (request, response) => {
+
+  // console.log(request.query);
   let moviesName = request.query.movies;
   // let cityName = request.query.city;
   let url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${moviesName}`;
   try {
     let moviesResponse = await axios.get(url);
     console.log(moviesResponse.data);
-    let dataToSend = moviesResponse.data.data.map(element => {
+    let dataToSend = moviesResponse.data.results.map(element => {
       return new Movies(element);
     });
 
@@ -79,9 +78,6 @@ class Movies {
 app.get('*', (request, response) => {
   response.status(404).send('This route does not exist');
 });
-
-
-
 
 
 app.listen(PORT, () => console.log(`We are up on PORT: ${PORT}`));
