@@ -71,8 +71,8 @@ app.get('/movies', async (request, response) => {
 
 class Movies {
   constructor(moviesObj) {
-    this.date = moviesObj.valid_date;
-    this.description = moviesObj.weather.description;
+    this.title = moviesObj.original_title;
+    this.doverview = moviesObj.overview;
   }
 }
 
