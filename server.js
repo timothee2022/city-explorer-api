@@ -72,7 +72,7 @@ app.get('/movies', async (request, response) => {
 class Movies {
   constructor(moviesObj) {
     this.title = moviesObj.original_title;
-    this.doverview = moviesObj.overview;
+    this.overview = moviesObj.overview;
   }
 }
 
