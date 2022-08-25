@@ -50,5 +50,38 @@ app.get('*', (request, response) => {
 
 
 
+app.get('/movies', async (request, response) => {
+  let moviesName = request.query.movies;
+  // let cityName = request.query.city;
+  let url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${moviesName}`;
+  try {
+    let moviesResponse = await axios.get(url);
+    console.log(moviesResponse.data);
+    let dataToSend = moviesResponse.data.data.map(element => {
+      return new Movies(element);
+    });
+
+    response.send(dataToSend).status(200);
+  } catch (error) {
+    response.send(error.message).status(500);
+  }
+
+});
+
+
+class Movies {
+  constructor(moviesObj) {
+    this.date = moviesObj.valid_date;
+    this.description = moviesObj.weather.description;
+  }
+}
+
+app.get('*', (request, response) => {
+  response.status(404).send('This route does not exist');
+});
+
+
+
+
 
 app.listen(PORT, () => console.log(`We are up on PORT: ${PORT}`));
