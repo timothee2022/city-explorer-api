@@ -5,6 +5,9 @@ require('dotenv').config();
 const cors = require('cors');
 const axios = require('axios');
 
+const getWeather = require('./weather.js');
+const getMovies = require('./movies.js');
+
 
 const app = express();
 
@@ -18,62 +21,11 @@ app.get('/', (request, response) => {
   response.status(200).send('Welcome to my server');
 });
 
-app.get('/weather', async (request, response) => {
-  let cityName = request.query.city;
-  let url = `http://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHER_API_KEY}&city=${cityName}&days=7`;
-  try {
-    let weatherResponse = await axios.get(url);
-    // console.log(weatherResponse.data);
-    let dataToSend = weatherResponse.data.data.map(element => {
-      return new Weather(element);
-    });
+app.get('/weather', getWeather);
 
-    response.send(dataToSend).status(200);
-  } catch (error) {
-    response.send(error.message).status(500);
-  }
-
-});
+app.get('/movies', getMovies);
 
 
-class Weather {
-  constructor(weatherObj) {
-    this.date = weatherObj.valid_date;
-    this.description = weatherObj.weather.description;
-  }
-}
-
-
-
-
-
-app.get('/movies', async (request, response) => {
-
-  // console.log(request.query);
-  let moviesName = request.query.movies;
-  // let cityName = request.query.city;
-  let url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${moviesName}`;
-  try {
-    let moviesResponse = await axios.get(url);
-    console.log(moviesResponse.data);
-    let dataToSend = moviesResponse.data.results.map(element => {
-      return new Movies(element);
-    });
-
-    response.send(dataToSend).status(200);
-  } catch (error) {
-    response.send(error.message).status(500);
-  }
-
-});
-
-
-class Movies {
-  constructor(moviesObj) {
-    this.title = moviesObj.original_title;
-    this.overview = moviesObj.overview;
-  }
-}
 
 app.get('*', (request, response) => {
   response.status(404).send('This route does not exist');
